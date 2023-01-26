@@ -8,9 +8,10 @@ import { ServService } from '../app/serv.service';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
-  public title = 'autocomplete';
-
+  // aqui é onde ficarão todas as opções trazidas pela requisição
   public options: string[] = [];
+
+  // aqui é onde ficarão apenas os nomes que contém na string o valor que for inserido no input
   public filteredOptions: string[] = [];
 
   public form: FormGroup;
@@ -25,11 +26,11 @@ export class AppComponent implements OnInit {
   // construção do formulário
   public initForm() {
     this.form = this._fb.group({
-      employee: [null],
+      name: [null],
     });
 
     // detecção de mudanças no valor do input
-    this.form.get('employee').valueChanges.subscribe((response: string) => {
+    this.form.get('name').valueChanges.subscribe((response: string) => {
       this.filterData(response);
     });
   }
