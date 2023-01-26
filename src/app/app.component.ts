@@ -47,7 +47,7 @@ export class AppComponent implements OnInit, OnDestroy {
   // filtro
   public filterData(entryValue: string) {
     this.filteredOptions = this.options.filter((item) => {
-      return item.toLowerCase().includes(entryValue.toLocaleLowerCase());
+      return item.toLowerCase().includes(entryValue.toLowerCase());
     });
   }
 
