@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { ServService } from '../app/serv.service';
 
 @Component({
@@ -7,7 +8,7 @@ import { ServService } from '../app/serv.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   // aqui é onde ficarão todas as opções trazidas pela requisição
   public options: string[] = [];
 
@@ -16,11 +17,17 @@ export class AppComponent implements OnInit {
 
   public form: FormGroup;
 
+  public subscriptions$ = new Subscription();
+
   constructor(private _service: ServService, private _fb: FormBuilder) {}
 
   ngOnInit() {
     this.initForm();
     this.getData();
+  }
+
+  ngOnDestroy() {
+    this.subscriptions$.unsubscribe();
   }
 
   // construção do formulário
@@ -30,9 +37,11 @@ export class AppComponent implements OnInit {
     });
 
     // detecção de mudanças no valor do input
-    this.form.get('name').valueChanges.subscribe((response: string) => {
-      this.filterData(response);
-    });
+    this.subscriptions$.add(
+      this.form.get('name').valueChanges.subscribe((response: string) => {
+        this.filterData(response);
+      })
+    );
   }
 
   // filtro
@@ -44,9 +53,11 @@ export class AppComponent implements OnInit {
 
   // requisição
   public getData() {
-    this._service.getData().subscribe(response => {
-      this.options = response.map(item => item.name);
-      this.filteredOptions = this.options;
-    });
+    this.subscriptions$.add(
+      this._service.getData().subscribe((response) => {
+        this.options = response.map((item) => item.name);
+        this.filteredOptions = this.options;
+      })
+    );
   }
 }
