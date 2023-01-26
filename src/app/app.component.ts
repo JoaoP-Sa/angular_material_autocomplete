@@ -1,51 +1,51 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import {ServService} from '../app/serv.service';
+import { ServService } from '../app/serv.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
-  title = 'autocomplete';
+  public title = 'autocomplete';
 
-  options = ["Sam", "Varun", "Jasmine"];
+  public options: string[] = [];
+  public filteredOptions: string[] = [];
 
-  filteredOptions;
+  public form: FormGroup;
 
+  constructor(private _service: ServService, private _fb: FormBuilder) {}
 
-  formGroup : FormGroup;
-  constructor(private service : ServService, private fb : FormBuilder){}
-
-  ngOnInit(){
+  ngOnInit() {
     this.initForm();
-    this.getNames();
+    this.getData();
   }
 
-  initForm(){
-    this.formGroup = this.fb.group({
-      'employee' : ['']
-    })
-    this.formGroup.get('employee').valueChanges.subscribe(response => {
-      console.log('data is ', response);
+  // construção do formulário
+  public initForm() {
+    this.form = this._fb.group({
+      employee: [null],
+    });
+
+    // detecção de mudanças no valor do input
+    this.form.get('employee').valueChanges.subscribe((response: string) => {
       this.filterData(response);
-    })
+    });
   }
 
-  filterData(enteredData){
-    this.filteredOptions = this.options.filter(item => {
-      return item.toLowerCase().indexOf(enteredData.toLowerCase()) > -1
-    })
+  // filtro
+  public filterData(entryValue: string) {
+    this.filteredOptions = this.options.filter((item) => {
+      return item.toLowerCase().includes(entryValue.toLocaleLowerCase());
+    });
   }
 
-  getNames(){
-    this.service.getData().subscribe(response => {
-      this.options = response;
-      this.filteredOptions = response;
-    })
+  // requisição
+  public getData() {
+    this._service.getData().subscribe(response => {
+      this.options = response.map(item => item.name);
+      this.filteredOptions = this.options;
+    });
   }
-
-
-  
 }
